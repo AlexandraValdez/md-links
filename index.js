@@ -1,16 +1,18 @@
 // import route from 'color-convert/route';
 import {
   existsPath,
-  joinPath,
+  // joinPath,
   toAbsolute,
   directory,
-  toFile,
-  markdownFile,
+  isMdFile,
+  // toFile,
+  // markdownFile,
   findLinksInFile,
+  processDirectory,
+  processLinks,
 } from "./api.js";
 
-const example = "./pruebas";
-export const mdLinks = (path) => {
+export const mdLinks = (path, options) => {
   return new Promise((resolve, reject) => {
     // indetifica si la ruta exista
     if (!existsPath(path)) {
@@ -18,33 +20,50 @@ export const mdLinks = (path) => {
       return;
     }
     const absolute = toAbsolute(path); // es absoluto? volver de relativo a absoluto
-
     if (!directory(absolute)) {
       findLinksInFile(absolute).then((links) => {
         resolve(links);
       });
       return;
     }
-    let links = [];
-    const files = toFile(absolute); // recorrer archivo (recursividad) [archivos]
-    const mdFiles = files.filter((file) => markdownFile(file)); // es md? [markdowns] meterlo en array
-    const fileLinksPromises = [];
-    mdFiles.forEach((file) => {
-      const newPath = joinPath(absolute, file); // unir la ruta con el archivo ex.md/pruebas.js --> nueva ruta
-      const fileLinksPromise = findLinksInFile(newPath) // hay links? match con regular expressions llenar objeto con propiedades
-      fileLinksPromises.push(fileLinksPromise)
-      //links = links.concat(fileLinks);  concatebamos todo al array links
-    });
+    const linksPromise = isMdFile(absolute)
+      ? findLinksInFile(absolute)
+      : processDirectory(absolute);
+
+    linksPromise
+      .then((links) => processLinks(links, options))
+      .then((results) => resolve(results))
+      .catch((error) => reject(error));
+
+    // let links = [];
+    // const files = toFile(absolute); // recorrer archivo (no hace recursividad) [archivos]
+    // const mdFiles = files.filter((file) => markdownFile(file)); // es md? [markdowns] meterlo en array
+    // const fileLinksPromises = [];
+    // mdFiles.forEach((file) => {
+    //   const newPath = joinPath(absolute, file); // unir la ruta con el archivo ex.md/pruebas.js --> nueva ruta
+    //   const fileLinksPromise = findLinksInFile(newPath); // hay links? match con regular expressions llenar objeto con propiedades
+    //   fileLinksPromises.push(fileLinksPromise);
+
+    //links = resolve(fileLinksPromise)
+    //resolve(links.concat(fileLinksPromises));  concatebamos todo al array links
+    //   Promise.all(fileLinksPromises)
+    //     .then((results) => {
+    //       links = results.flat();
+    //       resolve(links);
+    //     })
+    //     .catch((error) => reject(error));
+    // });
     // promise.all
-    // armar el array del link 
-    console.log('despues del forEach');
-    resolve(links);
+    // armar el array del link
+
+    // console.log('despues del forEach');
+    // resolve(links);
     //if (options.validate) {}
     // options - value - true or false
   });
 };
 
-mdLinks(example).then((result) => {
+mdLinks('./pruebas2', { validate: true }).then((result) => {
   console.log(result);
 });
 
