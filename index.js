@@ -8,8 +8,8 @@ import {
   // toFile,
   // markdownFile,
   findLinksInFile,
-  processDirectory,
-  processLinks,
+  dirToFile,
+  validateLinks,
 } from "./api.js";
 
 export const mdLinks = (path, options) => {
@@ -28,10 +28,10 @@ export const mdLinks = (path, options) => {
     }
     const linksPromise = isMdFile(absolute)
       ? findLinksInFile(absolute)
-      : processDirectory(absolute);
+      : dirToFile(absolute);
 
     linksPromise
-      .then((links) => processLinks(links, options))
+      .then((links) => validateLinks(links, options))
       .then((results) => resolve(results))
       .catch((error) => reject(error));
 
@@ -63,7 +63,7 @@ export const mdLinks = (path, options) => {
   });
 };
 
-mdLinks('./pruebas2', { validate: true }).then((result) => {
+mdLinks("./pruebas2", { validate: true }).then((result) => {
   console.log(result);
 });
 
