@@ -11,18 +11,19 @@ import {
   dirToFile,
   validateLinks,
 } from "./api.js";
+import chalk from "chalk";
 
 export const mdLinks = (path, options) => {
   return new Promise((resolve, reject) => {
     // indetifica si la ruta exista
     if (!existsPath(path)) {
-      reject("path does not exist"); // si no existe la ruta rechaza la promesa
+      reject(chalk.red("path does not exist")); // si no existe la ruta rechaza la promesa
       return;
     }
     const absolute = toAbsolute(path); // es absoluto? volver de relativo a absoluto
     if (!directory(absolute)) {
       findLinksInFile(absolute).then((links) => {
-        resolve(links);
+        resolve((links));
       });
       return;
     }
@@ -63,11 +64,13 @@ export const mdLinks = (path, options) => {
   });
 };
 
-mdLinks("./pruebas2", { validate: true }).then((result) => {
+mdLinks("./pruebas2/example2.md", { validate: false }).then((result) => {
   console.log(result);
 });
 
-// fs.readFile('./example.md', { encoding: 'utf-8'})
+
+
+// fs.readFile("./pruebas2/example2.md" "./pruebas2", { encoding: 'utf-8'})
 // .then(md => {
 //   console.log(md)
 // })

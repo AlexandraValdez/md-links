@@ -1,7 +1,9 @@
-import { existsSync, statSync, readFile, readdir } from "fs";
+import { existsSync, statSync, readFile, readdirSync } from "fs";
 import { isAbsolute, resolve, extname, join } from "path";
 import fetch from "node-fetch";
 import chalk from "chalk";
+
+// const red = chalk.bold.bgRed;
 
 export const existsPath = (path) => existsSync(path);
 
@@ -11,9 +13,6 @@ export const toAbsolute = (path) => {
 
 // verifica si es un directorio
 export const directory = (absolutePath) => statSync(absolutePath).isDirectory();
-
-// lee contenido dentro de un directorio returns an array of filenames present in that directory.
-// export const toFile = (absolutePath, callback) => readdirSync(absolutePath, callback);
 
 // to check if its a md file
 export const markdownFile = (path) => extname(path) === ".md";
@@ -55,28 +54,31 @@ export const isMdFile = (filePath) => {
   return statSync(filePath).isFile() && markdownFile(filePath);
 };
 
+
+// lee contenido dentro de un directorio returns an array of filenames present in that directory.
+// export const toFile = (absolutePath, callback) => readdirSync(absolutePath, callback);
+// recursividad para que lea los archivos 
 export const dirToFile = (dirPath) => {
   return new Promise((resolve, reject) => {
-    readdir(dirPath, (err, files) => {
-      if (err) {
-        reject(err);
-        return;
+    try {
+        const files = readdirSync(dirPath);
+        const filePromises = files.map((file) => {
+          const filePath = join(dirPath, file);
+          return isMdFile(filePath)
+            ? findLinksInFile(filePath)
+            : dirToFile(filePath);
+        });
+  
+        Promise.all(filePromises)
+          .then((results) => {
+            resolve(results.flat());
+          })
+          .catch((error) => reject(error));
+      } 
+      catch (error) {
+        reject(error);
       }
-
-      const filePromises = files.map((file) => {
-        const filePath = join(dirPath, file);
-        return isMdFile(filePath)
-          ? findLinksInFile(filePath)
-          : dirToFile(filePath);
-      });
-
-      Promise.all(filePromises)
-        .then((results) => {
-          resolve(results.flat());
-        })
-        .catch((error) => reject(error));
     });
-  });
 };
 
 export const validateLinks = (links, options) => {
