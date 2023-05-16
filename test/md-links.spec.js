@@ -47,11 +47,11 @@ describe('Folder tests', () => {
 });
 
 describe('Markdown file tests', () => {
-  it('should be return true if the path is a MdFile', () => {
+  it('should return true if the path is a MdFile', () => {
     expect(markdownFile('./file/example2.md')).toBe(true)
   })
 
-  it('should be return false if the path not a file and not a MdFile', () => {
+  it('should return false if the path not a file and not a MdFile', () => {
     expect(isMdFile('./file/test.txt')).toBe(false)
   })
 });
