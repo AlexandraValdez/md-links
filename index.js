@@ -10,7 +10,10 @@ import {
   findLinksInFile,
   dirToFile,
   validateLinks,
+  getStats
+  // validateLinks,
 } from "./api.js";
+
 import chalk from "chalk";
 
 export const mdLinks = (path, options) => {
@@ -22,9 +25,17 @@ export const mdLinks = (path, options) => {
     }
     const absolute = toAbsolute(path); // es absoluto? volver de relativo a absoluto
     if (!directory(absolute)) {
-      findLinksInFile(absolute).then((links) => {
-        resolve((links));
-      });
+      findLinksInFile(absolute)
+        .then((links) => {
+          if (options.validate) {
+            return validateLinks(links, options);
+          }
+          return links;
+        })
+        .then((results) => {
+          resolve(results);
+        })
+        .catch((error) => reject(error));
       return;
     }
     const linksPromise = isMdFile(absolute)
@@ -32,45 +43,30 @@ export const mdLinks = (path, options) => {
       : dirToFile(absolute);
 
     linksPromise
-      .then((links) => validateLinks(links, options))
-      .then((results) => resolve(results))
+      .then((links) => {
+        if (options.validate) {
+          return validateLinks(links, options);
+        }
+        return links;
+      })
+      .then((results) => {
+        if (options.stats) {
+          resolve(getStats(results));
+        } else { 
+          resolve(results);
+        }
+      })
       .catch((error) => reject(error));
-
-    // let links = [];
-    // const files = toFile(absolute); // recorrer archivo (no hace recursividad) [archivos]
-    // const mdFiles = files.filter((file) => markdownFile(file)); // es md? [markdowns] meterlo en array
-    // const fileLinksPromises = [];
-    // mdFiles.forEach((file) => {
-    //   const newPath = joinPath(absolute, file); // unir la ruta con el archivo ex.md/pruebas.js --> nueva ruta
-    //   const fileLinksPromise = findLinksInFile(newPath); // hay links? match con regular expressions llenar objeto con propiedades
-    //   fileLinksPromises.push(fileLinksPromise);
-
-    //links = resolve(fileLinksPromise)
-    //resolve(links.concat(fileLinksPromises));  concatebamos todo al array links
-    //   Promise.all(fileLinksPromises)
-    //     .then((results) => {
-    //       links = results.flat();
-    //       resolve(links);
-    //     })
-    //     .catch((error) => reject(error));
-    // });
-    // promise.all
-    // armar el array del link
-
-    // console.log('despues del forEach');
-    // resolve(links);
-    //if (options.validate) {}
-    // options - value - true or false
   });
 };
 
-mdLinks("./pruebas2/example2.md", { validate: false }).then((result) => {
+mdLinks("./file/example2.md", { validate: true }).then((result) => {
   console.log(result);
+}).catch((error) => {
+  console.log(error);
 });
 
-
-
-// fs.readFile("./pruebas2/example2.md" "./pruebas2", { encoding: 'utf-8'})
+// fs.readFile("./file/example2.md" "./file", { encoding: 'utf-8'})
 // .then(md => {
 //   console.log(md)
 // })
