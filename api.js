@@ -91,7 +91,7 @@ export const validateLinks = (links, options) => {
           })
           .catch(() => {
             link.status = "N/A";
-            link.ok = "fail";
+            link.message = "fail";
             return link;
           });
       });
