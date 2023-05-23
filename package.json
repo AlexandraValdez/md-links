@@ -120,6 +120,9 @@
   },
   "author": "Alexandra Valdez",
   "license": "ISC",
+  "bin": {
+    "say-hello": "./cli.js"
+  },
   "bugs": {
     "url": "https://github.com/AlexandraValdez/md-links/issues"
   },

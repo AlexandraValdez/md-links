@@ -4,7 +4,7 @@
 // const { mdLinks } = require("./index.js").default;
 import chalk from "chalk";
 import { mdLinks } from "./index.js";
-import { getStats } from "./api.js";
+import { getStats, statsValidate } from "./api.js";
 import { argv } from "process";
 
 // mdLinks("/ejemplo/noexiste.md")
@@ -14,6 +14,7 @@ import { argv } from "process";
 //   });
 
 const args = argv.slice(2);
+// const path = argv[2];
 const path = "./file/example2.md";
 const options = {
   validate: args.includes("--validate"),
@@ -33,6 +34,7 @@ const options = {
 //   options.stats = true;
 // }
 
+// [0 -node, 1-script, 2-ruta, 3 o 4 ya --validate o --stats]
 if (args.includes("--help")) {
   console.log("mdLinks - A tool to analyze Markdown files and extract links.");
   console.log("Usage: mdLinks <path> [options]");
@@ -45,46 +47,38 @@ if (args.includes("--help")) {
 }
 
 export const formatLinkOutput = (link, validate) => {
-  let output = `${link.file} ${link.href}`;
+  let output = `${chalk.grey.bold(link.file)} ${chalk.cyan(link.href)}`;
   if (validate) {
-    output += ` ${link.ok === "ok" ? chalk.green("✔") : chalk.red("✖")}`;
+  output += ` ${
+    link.message === "ok" ? chalk.bgGreen.bold(" OK ✔ ") : chalk.bgRed.bold(" FAIL ✖ ")
+  }`;
+  output += ` ${chalk.white(link.text)}`;
   }
-  if (link.text.length > 50) {
+  /* if (link.text.length > 50) {
     output += ` 
     ${chalk.gray(link.text.slice(0, 50) + "...")}\n
     ${chalk.bgGreen.white(link.href)}: ${unique}`;
   } else {
-    output += ` ${chalk.blue(link.text)}`;
-  }
+    ;
+  } */
   return output;
 };
 
 mdLinks(path, options)
   .then((results) => {
-    if (options.stats) {
+    if (options.stats && options.validate) {
+      const statsValidateText = statsValidate(results);
+      console.log(statsValidateText);
+    } else if (options.stats) {
       const statsText = getStats(results);
       console.log(statsText);
-    } else {
+    } else if (options.validate) {
       results.forEach((link) => {
         console.log(formatLinkOutput(link, options.validate));
       });
-
       // console.log(links);
     }
-
-    results.forEach((link) => {
-      const { href, text, file, status, ok } = link;
-      console.log(`Link: ${chalk.blue(href)}`);
-      console.log(`Text: ${text}`);
-      console.log(`File: ${chalk.yellow(file)}`);
-      if (options.validate) {
-        const statusColor = ok === "ok" ? chalk.green : chalk.red;
-        console.log(`Status: ${statusColor(status)}`);
-      }
-      console.log("----------------------");
-    });
   })
-  .then((links) => {})
   .catch((error) => {
     console.error(error);
   });

@@ -54,18 +54,25 @@ export const isMdFile = (filePath) => {
   return statSync(filePath).isFile() && markdownFile(filePath);
 };
 
-// lee contenido dentro de un directorio returns an array of filenames present in that directory.
-// export const toFile = (absolutePath, callback) => readdirSync(absolutePath, callback);
-// recursividad para que lea los archivos
 export const dirToFile = (dirPath) => {
   const files = readdirSync(dirPath);
+
   const filePromises = files.map((file) => {
     const filePath = join(dirPath, file);
-    return isMdFile(filePath) ? findLinksInFile(filePath) : dirToFile(filePath);
+
+    if (isMdFile(filePath)) {
+      return findLinksInFile(filePath);
+    }
+
+    if (directory(filePath)) {
+      return dirToFile(filePath);
+    }
+
+    return [];
   });
 
   return Promise.all(filePromises)
-    .then((results) => results.flat())
+    .then((results) => results.flat()) // flat para obtener un solo array con todos los links del dir
     .catch((error) => {
       throw new Error(`Error processing directory: ${dirPath}\n${error}`);
     });
@@ -79,6 +86,7 @@ export const validateLinks = (links, options) => {
           .then((response) => {
             link.status = response.status;
             link.message = response.ok ? "ok" : "fail";
+
             return link;
           })
           .catch(() => {
@@ -97,7 +105,15 @@ export const validateLinks = (links, options) => {
   });
 };
 
+let contador = 0;
+
 const countUniqueLinks = (links) => {
+  console.log({ contador });
+  contador++;
+  console.log("Type of links:", typeof links);
+  console.log("Value of links", links);
+  console.log("-------------------------------------------");
+  
   // set object to store href values of each link
   const uniqueLinks = new Set(links.map((link) => link.href));
   // size property to know the # of elements in the set
@@ -106,18 +122,28 @@ const countUniqueLinks = (links) => {
 
 const countBrokenLinks = (links) => {
   // filter to create a new array with fail messages
-  const brokenLinks = links.filter((link) => link.ok === "fail");
+  const brokenLinks = links.filter((link) => link.message === "fail");
   return brokenLinks.length;
 };
 
 export const getStats = (links) => {
   const total = links.length;
   const unique = countUniqueLinks(links);
+  const statsText = `
+  ${chalk.bgBlue.white(" Total ")}: ${total}\n
+  ${chalk.bgGreen.white(" Unique ")}: ${unique}\n
+`;
+
+  return statsText;
+};
+export const statsValidate = (links) => {
+  const total = links.length;
+  const unique = countUniqueLinks(links);
   const broken = countBrokenLinks(links);
   const statsText = `
-  Total: ${total}\n
-  Unique: ${unique}\n
-  Broken: ${broken}`;
+  ${chalk.bgBlue.white(" Total ")}: ${total}\n
+  ${chalk.bgGreen.white(" Unique ")}: ${unique}\n
+  ${chalk.bgRed.white(" Broken ")}: ${broken}`;
 
   return statsText;
 };

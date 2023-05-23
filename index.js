@@ -10,7 +10,7 @@ import {
   findLinksInFile,
   dirToFile,
   validateLinks,
-  getStats
+  getStats,
   // validateLinks,
 } from "./api.js";
 
@@ -24,20 +24,10 @@ export const mdLinks = (path, options) => {
       return;
     }
     const absolute = toAbsolute(path); // es absoluto? volver de relativo a absoluto
-    if (!directory(absolute)) {
-      findLinksInFile(absolute)
-        .then((links) => {
-          if (options.validate) {
-            return validateLinks(links, options);
-          }
-          return links;
-        })
-        .then((results) => {
-          resolve(results);
-        })
-        .catch((error) => reject(error));
-      return;
-    }
+    // if (!directory(absolute)) {
+    //   findLinksInFile(absolute);
+    //   return;
+    // }
     const linksPromise = isMdFile(absolute)
       ? findLinksInFile(absolute)
       : dirToFile(absolute);
@@ -52,7 +42,7 @@ export const mdLinks = (path, options) => {
       .then((results) => {
         if (options.stats) {
           resolve(getStats(results));
-        } else { 
+        } else {
           resolve(results);
         }
       })
@@ -60,11 +50,13 @@ export const mdLinks = (path, options) => {
   });
 };
 
-mdLinks("./file/example2.md", { validate: true }).then((result) => {
-  console.log(result);
-}).catch((error) => {
-  console.log(error);
-});
+// mdLinks("./file/example2.md", { validate: true })
+//   .then((result) => {
+//     console.log(result);
+//   })
+//   .catch((error) => {
+//     console.log(error);
+//   });
 
 // fs.readFile("./file/example2.md" "./file", { encoding: 'utf-8'})
 // .then(md => {
