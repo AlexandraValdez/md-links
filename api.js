@@ -108,16 +108,32 @@ export const validateLinks = (links, options) => {
 let contador = 0;
 
 const countUniqueLinks = (links) => {
-  console.log({ contador });
-  contador++;
-  console.log("Type of links:", typeof links);
-  console.log("Value of links", links);
-  console.log("-------------------------------------------");
-  
-  // set object to store href values of each link
-  const uniqueLinks = new Set(links.map((link) => link.href));
-  // size property to know the # of elements in the set
-  return uniqueLinks.size;
+  try {
+    console.log({ contador });
+    contador++;
+    console.log("Type of links:", typeof links);
+    console.log("Value of links", links);
+    console.log("-------------------------------------------");
+
+    if (typeof links === "object" || typeof links === "array") {
+      // set object to store href values of each link
+      const uniqueLinks = new Set(links.map((link) => link.href));
+      // size property to know the # of elements in the set
+      return uniqueLinks.size;
+    }
+    throw new Error("Error en tipo");
+  } catch (error) {
+    const e = new Error();
+    const regex = /\((.*):(\d+):(\d+)\)$/;
+    const match = regex.exec(e.stack.split("\n")[2]);
+    const objError = {
+      filepath: match[1],
+      line: match[2],
+      column: match[3],
+    };
+    console.log({ objError });
+    console.log("Error countUniqueLinks: ", error);
+  }
 };
 
 const countBrokenLinks = (links) => {
@@ -127,15 +143,17 @@ const countBrokenLinks = (links) => {
 };
 
 export const getStats = (links) => {
+  console.log("getStats", links);
   const total = links.length;
   const unique = countUniqueLinks(links);
   const statsText = `
-  ${chalk.bgBlue.white(" Total ")}: ${total}\n
-  ${chalk.bgGreen.white(" Unique ")}: ${unique}\n
-`;
+    ${chalk.bgBlue.white(" Total ")}: ${total}\n
+    ${chalk.bgGreen.white(" Unique ")}: ${unique}\n
+  `;
 
   return statsText;
 };
+
 export const statsValidate = (links) => {
   const total = links.length;
   const unique = countUniqueLinks(links);
@@ -146,4 +164,24 @@ export const statsValidate = (links) => {
   ${chalk.bgRed.white(" Broken ")}: ${broken}`;
 
   return statsText;
+};
+
+export const formatLinkOutput = (link, validate) => {
+  let output = `${chalk.grey.bold(link.file)} ${chalk.cyan(link.href)}`;
+  if (validate) {
+    output += ` ${
+      link.message === "ok"
+        ? chalk.bgGreen.bold(" OK ✔ ")
+        : chalk.bgRed.bold(" FAIL ✖ ")
+    }`;
+    output += ` ${chalk.white(link.text)}`;
+  }
+  /* if (link.text.length > 50) {
+    output += ` 
+    ${chalk.gray(link.text.slice(0, 50) + "...")}\n
+    ${chalk.bgGreen.white(link.href)}: ${unique}`;
+  } else {
+    ;
+  } */
+  return output;
 };

@@ -34,6 +34,7 @@ export const mdLinks = (path, options) => {
 
     linksPromise
       .then((links) => {
+        // console.log("index", { links });
         if (options.validate) {
           return validateLinks(links, options);
         }
