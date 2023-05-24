@@ -1,14 +1,12 @@
 # Markdown Links
 
+## Índice
 
 <table align="right">
  <tr><td> <a href="README.md"><img src="./images/usa.png" height="13"> English</a></td></tr>
  <tr><td><a href="README_es.md"><img style="margin: 0px 0px 2px 0px" src="./images/esp.png" height="8.5"> Español</a></td></tr>
 </td></tr>
 </table>
-
-
-## Índice
 
 * [1. Resumen del proyecto](#1-resumen-del-proyecto)
 * [2. Consideraciones generales](#2-consideraciones-generales)
