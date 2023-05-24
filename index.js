@@ -4,8 +4,6 @@ import {
   toAbsolute,
   directory,
   isMdFile,
-  // toFile,
-  // markdownFile,
   findLinksInFile,
   dirToFile,
   validateLinks,

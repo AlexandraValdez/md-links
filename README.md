@@ -19,7 +19,7 @@
 
 ## 1. Summary
 
-Tool created with [Node.js](https://nodejs.org/), hat reads and analyzes files in `Markdown`, format to verify the contained links and report
+Tool created with [Node.js](https://nodejs.org/), that reads and analyzes files in `Markdown`, format to verify the contained links and report
 some statistics.
 
 ## 2. General aspects
