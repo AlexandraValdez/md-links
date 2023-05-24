@@ -90,7 +90,7 @@ export const validateLinks = (links, options) => {
             return link;
           })
           .catch(() => {
-            link.status = "N/A";
+            link.status = "404";
             link.message = "fail";
             return link;
           });
@@ -136,6 +136,7 @@ export const getStats = (links) => {
 
   return statsText;
 };
+
 export const statsValidate = (links) => {
   const total = links.length;
   const unique = countUniqueLinks(links);
