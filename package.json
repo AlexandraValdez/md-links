@@ -116,12 +116,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AlexandraValdez/md-links.git"
+    "url": "https://github.com/AlexandraValdez/md-links.git"
   },
   "author": "Alexandra Valdez",
   "license": "ISC",
   "bin": {
-    "say-hello": "./cli.js"
+    "mdlinks": "./cli.js"
   },
   "bugs": {
     "url": "https://github.com/AlexandraValdez/md-links/issues"

@@ -4,7 +4,6 @@
 // const { mdLinks } = require("./index.js").default;
 import chalk from "chalk";
 import { mdLinks } from "./index.js";
-import { getStats, statsValidate } from "./api.js";
 import { argv } from "process";
 
 // mdLinks("/ejemplo/noexiste.md")
@@ -14,25 +13,12 @@ import { argv } from "process";
 //   });
 
 const args = argv.slice(2);
-// const path = argv[2];
-const path = "./file/example2.md";
+// const path = "./file/example2.md";
+const path = args[0];
 const options = {
   validate: args.includes("--validate"),
   stats: args.includes("--stats"),
 };
-
-// if (args.includes('--validate'))
-// .then(results => {
-//     results.forEach(link => {
-//       const { href, text, file } = link;
-//       console.log(`Link: ${chalk.blue(href)}`);
-//       console.log(`Text: ${text}`);
-//       console.log(`File: ${chalk.green(file)}`);  })
-// });
-
-// if (args.includes('--stats')) {
-//   options.stats = true;
-// }
 
 // [0 -node, 1-script, 2-ruta, 3 o 4 ya --validate o --stats]
 if (args.includes("--help")) {
@@ -44,9 +30,34 @@ if (args.includes("--help")) {
   console.log("--stats      Display statistics about the links.");
   console.log("--help       Display help information.");
 } else {
+  mdLinks(path, options)
+    .then((results) => {
+      if (options.stats && options.validate) {
+        const statsValidateText = `
+      ${chalk.bgBlue.white(" Total ")}: ${results.total}\n
+      ${chalk.bgGreen.white(" Unique ")}: ${results.unique}\n
+      ${chalk.bgRed.white(" Broken ")}: ${results.broken}
+      `;
+        console.log(statsValidateText);
+      } else if (options.stats) {
+        const statsText = `
+      ${chalk.bgBlue.white(" Total ")}: ${results.total}\n
+      ${chalk.bgGreen.white(" Unique ")}: ${results.unique}\n
+      `;
+        console.log(statsText);
+      } else if (options.validate) {
+        results.forEach((link) => {
+          console.log(formatLinkOutput(link, options.validate));
+        });
+        // console.log(links);
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 }
 
-export const formatLinkOutput = (link, validate) => {
+const formatLinkOutput = (link, validate) => {
   let output = `${chalk.grey.bold(link.file)} ${chalk.cyan(link.href)}`;
   if (validate) {
     output += ` ${
@@ -56,31 +67,10 @@ export const formatLinkOutput = (link, validate) => {
     }`;
     output += ` ${chalk.yellow(link.status)} ${chalk.white(link.text)}`;
   }
-  /* if (link.text.length > 50) {
+  if (link.text.length > 50) {
     output += ` 
     ${chalk.gray(link.text.slice(0, 50) + "...")}\n
     ${chalk.bgGreen.white(link.href)}: ${unique}`;
-  } else {
-    ;
-  } */
+  }
   return output;
 };
-
-mdLinks(path, options)
-  .then((results) => {
-    if (options.stats && options.validate) {
-      const statsValidateText = statsValidate(results);
-      console.log(statsValidateText);
-    } else if (options.stats) {
-      const statsText = getStats(results);
-      console.log(statsText);
-    } else if (options.validate) {
-      results.forEach((link) => {
-        console.log(formatLinkOutput(link, options.validate));
-      });
-      // console.log(links);
-    }
-  })
-  .catch((error) => {
-    console.error(error);
-  });

@@ -105,14 +105,14 @@ export const validateLinks = (links, options) => {
   });
 };
 
-let contador = 0;
+// let contador = 0;
 
 const countUniqueLinks = (links) => {
-  console.log({ contador });
-  contador++;
-  console.log("Type of links:", typeof links);
-  console.log("Value of links", links);
-  console.log("-------------------------------------------");
+  // console.log({ contador });
+  // contador++;
+  // console.log("Type of links:", typeof links);
+  // console.log("Value of links", links);
+  // console.log("-------------------------------------------");
   
   // set object to store href values of each link
   const uniqueLinks = new Set(links.map((link) => link.href));
@@ -129,22 +129,12 @@ const countBrokenLinks = (links) => {
 export const getStats = (links) => {
   const total = links.length;
   const unique = countUniqueLinks(links);
-  const statsText = `
-  ${chalk.bgBlue.white(" Total ")}: ${total}\n
-  ${chalk.bgGreen.white(" Unique ")}: ${unique}\n
-`;
-
-  return statsText;
+  return {total: total , unique: unique};
 };
 
 export const statsValidate = (links) => {
   const total = links.length;
   const unique = countUniqueLinks(links);
   const broken = countBrokenLinks(links);
-  const statsText = `
-  ${chalk.bgBlue.white(" Total ")}: ${total}\n
-  ${chalk.bgGreen.white(" Unique ")}: ${unique}\n
-  ${chalk.bgRed.white(" Broken ")}: ${broken}`;
-
-  return statsText;
+  return {total, unique, broken};
 };

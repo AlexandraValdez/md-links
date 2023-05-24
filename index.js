@@ -1,7 +1,6 @@
 // import route from 'color-convert/route';
 import {
   existsPath,
-  // joinPath,
   toAbsolute,
   directory,
   isMdFile,
@@ -11,7 +10,7 @@ import {
   dirToFile,
   validateLinks,
   getStats,
-  // validateLinks,
+  statsValidate,
 } from "./api.js";
 
 import chalk from "chalk";
@@ -24,10 +23,10 @@ export const mdLinks = (path, options) => {
       return;
     }
     const absolute = toAbsolute(path); // es absoluto? volver de relativo a absoluto
-    // if (!directory(absolute)) {
-    //   findLinksInFile(absolute);
-    //   return;
-    // }
+    /* if (!directory(absolute)) {
+      findLinksInFile(absolute);
+      return;
+    } */
     const linksPromise = isMdFile(absolute)
       ? findLinksInFile(absolute)
       : dirToFile(absolute);
@@ -40,17 +39,19 @@ export const mdLinks = (path, options) => {
         return links;
       })
       .then((results) => {
-        if (options.stats) {
+        if (options.stats && options.validate) {
+          const output = statsValidate(results);
+          resolve(output);
+        } else if (options.stats) {
           resolve(getStats(results));
-        } else {
-          resolve(results);
         }
+        return resolve(results);
       })
       .catch((error) => reject(error));
   });
 };
 
-// mdLinks("./file/example2.md", { validate: true })
+// mdLinks("./file/example2.md", { validate: false })
 //   .then((result) => {
 //     console.log(result);
 //   })
