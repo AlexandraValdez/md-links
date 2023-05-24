@@ -49,10 +49,12 @@ if (args.includes("--help")) {
 export const formatLinkOutput = (link, validate) => {
   let output = `${chalk.grey.bold(link.file)} ${chalk.cyan(link.href)}`;
   if (validate) {
-  output += ` ${
-    link.message === "ok" ? chalk.bgGreen.bold(" OK ✔ ") : chalk.bgRed.bold(" FAIL ✖ ")
-  }`;
-  output += ` ${chalk.white(link.text)}`;
+    output += ` ${
+      link.message === "ok"
+        ? chalk.bgGreen.bold(" OK ✔ ")
+        : chalk.bgRed.bold(" FAIL ✖ ")
+    }`;
+    output += ` ${chalk.yellow(link.status)} ${chalk.white(link.text)}`;
   }
   /* if (link.text.length > 50) {
     output += ` 
