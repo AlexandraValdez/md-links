@@ -3,8 +3,6 @@ import { isAbsolute, resolve, extname, join } from "path";
 import fetch from "node-fetch";
 import chalk from "chalk";
 
-// const red = chalk.bold.bgRed;
-
 export const existsPath = (path) => existsSync(path);
 
 export const toAbsolute = (path) => {
@@ -28,7 +26,7 @@ export const findLinksInFile = (absolute) => {
         reject(chalk.red(`${error} , ${fileContent} couldn't be read `));
         return;
       }
-      
+
       const fileLinks = [];
       const linkRegex = /\[([^\]]+)\]\(([^\)]+)\)/g;
       // hacemos match con el metodo matchAll()
