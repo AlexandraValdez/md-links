@@ -38,7 +38,7 @@ algunas estadísticas.
 ## 3. Instala 
 
 ``` set up
-npm install markdown-links-analyzer
+npm install i @alexandravaldez/mdlinks
 ```
 
 ## 4. Modo de uso 

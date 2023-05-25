@@ -14,7 +14,6 @@ const options = {
   stats: args.includes("--stats"),
 };
 
-
 if (args.includes("--help")) {
   console.log("mdLinks - A tool to analyze Markdown files and extract links.");
   console.log("Usage: mdLinks <path> [options]");
@@ -39,14 +38,11 @@ if (args.includes("--help")) {
       ${chalk.bgGreen.white(" Unique ")}: ${results.unique}\n
       `;
         console.log(statsText);
-      } else if (options.validate) {
+      } else {
         results.forEach((link) => {
           console.log(formatLinkOutput(link, options.validate));
         });
       }
-      results.forEach((link) => {
-        console.log(`${chalk.grey.bold(link.file)} ${chalk.cyan(link.href)} ${chalk.white(link.text)}`);
-      })
     })
     .catch((error) => {
       console.error(error);
@@ -54,14 +50,14 @@ if (args.includes("--help")) {
 }
 
 const formatLinkOutput = (link, validate) => {
-  let output = `${chalk.grey.bold(link.file)} ${chalk.cyan(link.href)}`;
+  let output = `${chalk.grey.bold(link.file)} ${chalk.cyan(link.href)} ${chalk.white(link.text)} `;
   if (validate) {
     output += ` ${
       link.message === "ok"
         ? chalk.bgGreen.bold(" OK ✔ ")
         : chalk.bgRed.bold(" FAIL ✖ ")
     }`;
-    output += ` ${chalk.yellow(link.status)} ${chalk.white(link.text)}`;
+    output += ` ${chalk.yellow(link.status)} `;
   }
   if (link.text.length > 50) {
     output += ` 
