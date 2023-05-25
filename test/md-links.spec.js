@@ -7,6 +7,8 @@ import {
   existsPath,
   toAbsolute,
   findLinksInFile,
+  dirToFile,
+  validateLinks,
 } from "../api.js";
 import chalk from "chalk";
 
@@ -50,16 +52,38 @@ describe("Folder tests", () => {
   it("should return false if the path is a file", () => {
     expect(directory("./file/example2.md")).toBe(false);
   });
+
+  it("dirToFile should return an array of links from all files in the directory", async () => {
+    const output = [
+      {
+        file: "file2\\file3\\test.md",
+        href: "http://es.wikipedia.org/wiki/Markdown",
+        text: "Markdown",
+      },
+    ];
+    const links = await dirToFile("./file2");
+    expect(links).toEqual(output);
+  });
+
+  /* it("dirToFile should reject when a folder can't be read", () => {
+    return(dirToFile("./file2")).catch((error) => {
+      expect(error).toContain('Error processing directory');
+    })
+  });  */
 });
 
 describe("file tests", () => {
   it("findLinksInFile should return an array of links", () => {
-    const output = [{ 
-      "file": "./file/test.md", "href": "http://es.wikipedia.org/wiki/Markdown", "text": "Markdown"
-    }];
-    return(findLinksInFile("./file/test.md")).then((links) =>{
+    const output = [
+      {
+        file: "./file2/file3/test.md",
+        href: "http://es.wikipedia.org/wiki/Markdown",
+        text: "Markdown",
+      },
+    ];
+    return findLinksInFile("./file2/file3/test.md").then((links) => {
       expect(links).toEqual(output);
-    })
+    });
   });
 
   it("should reject when a file can't be read", () => {
@@ -75,6 +99,25 @@ describe("Markdown file tests", () => {
   });
 
   it("should return false if the path not a file and not a MdFile", () => {
-    expect(isMdFile("./file/test.txt")).toBe(false);
+    expect(isMdFile("./file2/test.txt")).toBe(false);
+  });
+});
+
+describe('validateLinks', () => {
+  it('should validate links that work', () => {
+    const links = [
+      { file: "./file2/file3/test.md", href: 'http://es.wikipedia.org/wiki/Markdown', text: 'Markdow', status: 200, message: 'ok' },
+    ];
+
+    return validateLinks(links, { validate: true }).then((result) =>{
+      expect(result).toEqual(links);
+    });
+  });
+
+  it('should skip validation if options.validate is false', async () => {
+    const links = "./file2/file3/test.md"
+    const options = { validate: false };
+    const validatedLinks = await validateLinks("./file2/file3/test.md", options);
+    expect(validatedLinks).toBe(links);
   });
 });
