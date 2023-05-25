@@ -44,6 +44,9 @@ if (args.includes("--help")) {
           console.log(formatLinkOutput(link, options.validate));
         });
       }
+      results.forEach((link) => {
+        console.log(`${chalk.grey.bold(link.file)} ${chalk.cyan(link.href)} ${chalk.white(link.text)}`);
+      })
     })
     .catch((error) => {
       console.error(error);
