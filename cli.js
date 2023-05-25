@@ -12,15 +12,17 @@ import { argv } from "process";
 //     console.log(error);
 //   });
 
+// [0 -node, 1-script, 2-ruta, 3 o 4 ya --validate o --stats]
 const args = argv.slice(2);
 // const path = "./file/example2.md";
+// const path = "./file";
 const path = args[0];
 const options = {
   validate: args.includes("--validate"),
   stats: args.includes("--stats"),
 };
 
-// [0 -node, 1-script, 2-ruta, 3 o 4 ya --validate o --stats]
+
 if (args.includes("--help")) {
   console.log("mdLinks - A tool to analyze Markdown files and extract links.");
   console.log("Usage: mdLinks <path> [options]");
@@ -49,7 +51,6 @@ if (args.includes("--help")) {
         results.forEach((link) => {
           console.log(formatLinkOutput(link, options.validate));
         });
-        // console.log(links);
       }
     })
     .catch((error) => {

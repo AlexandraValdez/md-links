@@ -1,8 +1,6 @@
-// import route from 'color-convert/route';
 import {
   existsPath,
   toAbsolute,
-  directory,
   isMdFile,
   findLinksInFile,
   dirToFile,
@@ -21,10 +19,7 @@ export const mdLinks = (path, options) => {
       return;
     }
     const absolute = toAbsolute(path); // es absoluto? volver de relativo a absoluto
-    /* if (!directory(absolute)) {
-      findLinksInFile(absolute);
-      return;
-    } */
+    // Es archivo? encuentra links si no recorre file y encuentra links
     const linksPromise = isMdFile(absolute)
       ? findLinksInFile(absolute)
       : dirToFile(absolute);
@@ -48,16 +43,3 @@ export const mdLinks = (path, options) => {
       .catch((error) => reject(error));
   });
 };
-
-// mdLinks("./file/example2.md", { validate: false })
-//   .then((result) => {
-//     console.log(result);
-//   })
-//   .catch((error) => {
-//     console.log(error);
-//   });
-
-// fs.readFile("./file/example2.md" "./file", { encoding: 'utf-8'})
-// .then(md => {
-//   console.log(md)
-// })

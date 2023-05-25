@@ -28,9 +28,9 @@ export const findLinksInFile = (absolute) => {
         reject(chalk.red(`${error} , ${fileContent} couldn't be read `));
         return;
       }
-      // jorge: /https:\/\/[^\s]+/g
-      const linkRegex = /\[([^\]]+)\]\(([^\)]+)\)/g;
+      
       const fileLinks = [];
+      const linkRegex = /\[([^\]]+)\]\(([^\)]+)\)/g;
       // hacemos match con el metodo matchAll()
       const matches = fileContent.matchAll(linkRegex);
       // llenamos el objeto con las propiedades usando for de los matches
@@ -105,15 +105,7 @@ export const validateLinks = (links, options) => {
   });
 };
 
-// let contador = 0;
-
-const countUniqueLinks = (links) => {
-  // console.log({ contador });
-  // contador++;
-  // console.log("Type of links:", typeof links);
-  // console.log("Value of links", links);
-  // console.log("-------------------------------------------");
-  
+const countUniqueLinks = (links) => {  
   // set object to store href values of each link
   const uniqueLinks = new Set(links.map((link) => link.href));
   // size property to know the # of elements in the set
